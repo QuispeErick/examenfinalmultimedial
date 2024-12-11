@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Pacientes</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin: 0;
+        }
+
+        h2 {
+            color: #4CAF50;
+        }
+
+        form {
+            background-color: white;
+            padding: 20px;
+            margin: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        input[type="text"], input[type="number"], select {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 10px 0;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 4px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        a {
+            text-decoration: none;
+            color: #4CAF50;
+            font-size: 16px;
+            margin-top: 20px;
+            display: inline-block;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        /* Contenedor de los formularios */
+        .form-container {
+            width: 50%;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Botón Buscar */
+        button[type="button"] {
+            background-color: #2196F3;
+        }
+
+        button[type="button"]:hover {
+            background-color: #1976D2;
+        }
+    </style>
+    <script>
+        // Cargar diagnósticos al cargar la página
+        window.onload = async function() {
+            const response = await fetch('/diagnosticos');  // Trae todos los diagnósticos
+            const diagnosticos = await response.json();
+
+            // Poblar el select para Alta
+            const selectDiagnosticoAlta = document.getElementById('diagnostico1');
+            diagnosticos.forEach(diagnostico => {
+                const option = document.createElement('option');
+                option.value = diagnostico.id;  // Usamos el ID del diagnóstico
+                option.textContent = diagnostico.nombre;  // Mostramos el nombre
+                selectDiagnosticoAlta.appendChild(option);
+            });
+
+            // Poblar el select para Actualización
+            const selectDiagnosticoUpdate = document.getElementById('diagnostico2');
+            diagnosticos.forEach(diagnostico => {
+                const option = document.createElement('option');
+                option.value = diagnostico.id;  // Usamos el ID del diagnóstico
+                option.textContent = diagnostico.nombre;  // Mostramos el nombre
+                selectDiagnosticoUpdate.appendChild(option);
+            });
+        }
+
+        // Función para dar de alta un paciente
+        async function altaPaciente(event) {
+            event.preventDefault();
+            const data = {
+                nombre: document.getElementById('nombre1').value,
+                apellido: document.getElementById('apellido1').value,
+                diagnostico: document.getElementById('diagnostico1').value  // Enviar el ID del diagnóstico
+            };
+
+            console.log(data);  // Verifica que los datos estén bien estructurados
+
+            const response = await fetch('/pacientes', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+            alert(result.message || result.error);  // Mostrar mensaje de éxito o error
+        }
+
+        // Función para actualizar un paciente
+        async function actualizarPaciente(event) {
+            event.preventDefault();
+            const data = {
+                id: document.getElementById('id2').value,
+                nombre: document.getElementById('nombre2').value,
+                apellido: document.getElementById('apellido2').value,
+                diagnostico: document.getElementById('diagnostico2').value
+            };
+
+            const response = await fetch('/pacientes', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+            alert(result.message || result.error);
+        }
+
+        // Función para dar de baja un paciente
+        async function bajaPaciente(event) {
+            event.preventDefault();
+            const id = document.getElementById('id3').value;
+            const response = await fetch(`/pacientes?id=${id}`, {
+                method: 'DELETE'
+            });
+            const result = await response.json();
+            alert(result.message || result.error);
+        }
+
+        // Cargar datos del paciente cuando se ingresa un ID y se hace clic en Buscar
+        async function cargarDatosPaciente() {
+            const id = document.getElementById('id2').value; // Asegúrate de que el ID sea el de id2
+            if (!id) {
+                alert('Por favor ingrese un ID válido.');
+                return;
+            }
+
+            const response = await fetch(`/pacientes/${id}`);
+            const paciente = await response.json();
+
+            if (paciente.error) {
+                alert(paciente.error);  // Si no se encuentra el paciente
+            } else {
+                // Poblar los campos del formulario con los datos del paciente
+                document.getElementById('nombre2').value = paciente.nombre;
+                document.getElementById('apellido2').value = paciente.apellido;
+                document.getElementById('diagnostico2').value = paciente.diagnostico;
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>Gestión de Pacientes</h1>
+
+    <!-- Formulario para Alta -->
+    <div class="form-container">
+        <h2>Alta de Paciente</h2>
+        <form id="altaForm" onsubmit="altaPaciente(event)">
+            <input type="text" id="nombre1" placeholder="Nombre" required>
+            <input type="text" id="apellido1" placeholder="Apellido" required>
+            
+            <!-- Select para el diagnóstico -->
+            <select id="diagnostico1" required>
+                <option value="" disabled selected>Seleccione un diagnóstico</option>
+            </select>
+
+            <button type="submit">Dar de Alta</button>
+        </form>
+    </div>
+
+    <!-- Formulario para Actualización -->
+    <div class="form-container">
+        <h2>Actualizar Paciente</h2>
+        <form id="actualizaForm" onsubmit="actualizarPaciente(event)">
+            <input type="number" id="id2" placeholder="ID" required>
+            <button type="button" onclick="cargarDatosPaciente()">Buscar</button> <!-- Botón Buscar -->
+            <input type="text" id="nombre2" placeholder="Nombre" required>
+            <input type="text" id="apellido2" placeholder="Apellido" required>
+            <select id="diagnostico2" required>
+                <option value="" disabled selected>Seleccione un diagnóstico</option>
+            </select>
+            <button type="submit">Actualizar</button>
+        </form>
+    </div>
+
+    <!-- Formulario para Baja -->
+    <div class="form-container">
+        <h2>Baja de Paciente</h2>
+        <form id="bajaForm" onsubmit="bajaPaciente(event)">
+            <input type="number" id="id3" placeholder="ID del paciente" required>
+            <button type="submit">Dar de Baja</button>
+        </form>
+    </div>
+
+    <a href="/">Volver a la página principal</a>
+</body>
+</html>

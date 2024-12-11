@@ -1,0 +1,10 @@
+C:\Users\Erick\source\repos\GrietasDetectApp\GrietasDetectApp\bin\Debug\GrietasDetectApp.exe.config
+C:\Users\Erick\source\repos\GrietasDetectApp\GrietasDetectApp\bin\Debug\GrietasDetectApp.exe
+C:\Users\Erick\source\repos\GrietasDetectApp\GrietasDetectApp\bin\Debug\GrietasDetectApp.pdb
+C:\Users\Erick\source\repos\GrietasDetectApp\GrietasDetectApp\obj\Debug\GrietasDetectApp.csproj.AssemblyReference.cache
+C:\Users\Erick\source\repos\GrietasDetectApp\GrietasDetectApp\obj\Debug\GrietasDetectApp.Form1.resources
+C:\Users\Erick\source\repos\GrietasDetectApp\GrietasDetectApp\obj\Debug\GrietasDetectApp.Properties.Resources.resources
+C:\Users\Erick\source\repos\GrietasDetectApp\GrietasDetectApp\obj\Debug\GrietasDetectApp.csproj.GenerateResource.cache
+C:\Users\Erick\source\repos\GrietasDetectApp\GrietasDetectApp\obj\Debug\GrietasDetectApp.csproj.CoreCompileInputs.cache
+C:\Users\Erick\source\repos\GrietasDetectApp\GrietasDetectApp\obj\Debug\GrietasDetectApp.exe
+C:\Users\Erick\source\repos\GrietasDetectApp\GrietasDetectApp\obj\Debug\GrietasDetectApp.pdb

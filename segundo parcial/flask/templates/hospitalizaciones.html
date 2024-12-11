@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Hospitalizaciones</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin: 0;
+        }
+
+        h2 {
+            color: #4CAF50;
+            margin-top: 20px;
+        }
+
+        form {
+            background-color: white;
+            padding: 20px;
+            margin: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        input[type="date"], input[type="number"], select {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 10px 0;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 4px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        a {
+            text-decoration: none;
+            color: #4CAF50;
+            font-size: 16px;
+            margin-top: 20px;
+            display: inline-block;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        /* Contenedor de los formularios */
+        .form-container {
+            width: 50%;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Botón Buscar */
+        button[type="button"] {
+            background-color: #2196F3;
+        }
+
+        button[type="button"]:hover {
+            background-color: #1976D2;
+        }
+    </style>
+    <script>
+        // Cargar salas al cargar la página
+        window.onload = async function() {
+            const response = await fetch('/salas');  // Trae todas las salas
+            const salas = await response.json();
+
+            // Poblar el select para la sala en el formulario de Alta
+            const selectSalaAlta = document.getElementById('sala_id1');
+            salas.forEach(sala => {
+                const option = document.createElement('option');
+                option.value = sala.id;  // Usamos el ID de la sala
+                option.textContent = sala.nombre;  // Mostramos el nombre de la sala
+                selectSalaAlta.appendChild(option);
+            });
+
+            // Poblar el select para la sala en el formulario de Actualización
+            const selectSalaUpdate = document.getElementById('sala_id2');
+            salas.forEach(sala => {
+                const option = document.createElement('option');
+                option.value = sala.id;  // Usamos el ID de la sala
+                option.textContent = sala.nombre;  // Mostramos el nombre de la sala
+                selectSalaUpdate.appendChild(option);
+            });
+        }
+
+        // Función para dar de alta una hospitalización
+        async function altaHospitalizacion(event) {
+            event.preventDefault();
+            const data = {
+                fecha_alta: document.getElementById('fecha_alta1').value,
+                fecha_ingreso: document.getElementById('fecha_ingreso1').value,
+                paciente_id: document.getElementById('paciente_id1').value,
+                sala_id: document.getElementById('sala_id1').value
+            };
+
+            const response = await fetch('/hospitalizaciones', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+            alert(result.message || result.error);
+        }
+
+        // Función para actualizar una hospitalización
+        async function actualizarHospitalizacion(event) {
+            event.preventDefault();
+            const data = {
+                id: document.getElementById('id2').value,
+                fecha_alta: document.getElementById('fecha_alta2').value,
+                fecha_ingreso: document.getElementById('fecha_ingreso2').value,
+                paciente_id: document.getElementById('paciente_id2').value,
+                sala_id: document.getElementById('sala_id2').value
+            };
+
+            const response = await fetch('/hospitalizaciones', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+            alert(result.message || result.error);
+        }
+
+        // Función para dar de baja una hospitalización
+        async function bajaHospitalizacion(event) {
+            event.preventDefault();
+            const id = document.getElementById('id3').value;
+            const response = await fetch(`/hospitalizaciones?id=${id}`, {
+                method: 'DELETE'
+            });
+            const result = await response.json();
+            alert(result.message || result.error);
+        }
+
+        // Función para cargar los datos de una hospitalización por su ID
+        async function cargarDatosHospitalizacion() {
+            const id = document.getElementById('id2').value;
+            if (!id) {
+                alert('Por favor ingrese un ID válido.');
+                return;
+            }
+
+            const response = await fetch(`/hospitalizaciones/${id}`);
+            const hospitalizacion = await response.json();
+
+            if (hospitalizacion.error) {
+                alert(hospitalizacion.error);  // Si no se encuentra la hospitalización
+            } else {
+                // Poblar los campos del formulario con los datos de la hospitalización
+                document.getElementById('fecha_alta2').value = hospitalizacion.fecha_alta;
+                document.getElementById('fecha_ingreso2').value = hospitalizacion.fecha_ingreso;
+                document.getElementById('paciente_id2').value = hospitalizacion.paciente_id;
+                document.getElementById('sala_id2').value = hospitalizacion.sala_id;
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>Gestión de Hospitalizaciones</h1>
+
+    <!-- Formulario para Alta -->
+    <div class="form-container">
+        <h2>Alta de Hospitalización</h2>
+        <form id="altaForm" onsubmit="altaHospitalizacion(event)">
+            <input type="date" id="fecha_alta1" required>
+            <input type="date" id="fecha_ingreso1" required>
+            <input type="number" id="paciente_id1" placeholder="ID del paciente" required>
+            
+            <!-- Select para la sala -->
+            <select id="sala_id1" required>
+                <option value="" disabled selected>Seleccione una sala</option>
+            </select>
+
+            <button type="submit">Dar de Alta</button>
+        </form>
+    </div>
+
+    <!-- Formulario para Actualización -->
+    <div class="form-container">
+        <h2>Actualizar Hospitalización</h2>
+        <form id="actualizaForm" onsubmit="actualizarHospitalizacion(event)">
+            <input type="number" id="id2" placeholder="ID" required>
+            <button type="button" onclick="cargarDatosHospitalizacion()">Buscar</button> <!-- Botón Buscar -->
+            <input type="date" id="fecha_alta2" required>
+            <input type="date" id="fecha_ingreso2" required>
+            <input type="number" id="paciente_id2" placeholder="ID del paciente" required>
+            
+            <!-- Select para la sala -->
+            <select id="sala_id2" required>
+                <option value="" disabled selected>Seleccione una sala</option>
+            </select>
+            
+            <button type="submit">Actualizar</button>
+        </form>
+    </div>
+
+    <!-- Formulario para Baja -->
+    <div class="form-container">
+        <h2>Baja de Hospitalización</h2>
+        <form id="bajaForm" onsubmit="bajaHospitalizacion(event)">
+            <input type="number" id="id3" placeholder="ID de la hospitalización" required>
+            <button type="submit">Dar de Baja</button>
+        </form>
+    </div>
+
+    <a href="/">Volver a la página principal</a>
+</body>
+</html>

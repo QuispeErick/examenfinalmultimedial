@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Hospitalario</title>
+    <style>
+        /* Estilos generales */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin: 0;
+        }
+
+        /* Estilo de los botones */
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 10px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        /* Estilo de los enlaces */
+        a {
+            text-decoration: none;
+            color: #4CAF50;
+            font-size: 16px;
+            margin: 10px;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        /* Contenedor de la tabla */
+        #table-container {
+            padding: 20px;
+            margin: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Estilo de la tabla */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        /* Estilo del contenedor principal */
+        .container {
+            width: 80%;
+            margin: 0 auto;
+        }
+    </style>
+    <script>
+        async function fetchTable(tabla) {
+            const response = await fetch(`/tabla/${tabla}`);
+            const data = await response.json();
+            const container = document.getElementById('table-container');
+            container.innerHTML = '';
+            if (response.ok) {
+                const table = document.createElement('table');
+                const headers = Object.keys(data[0]);
+                const headerRow = document.createElement('tr');
+                headers.forEach(header => {
+                    const th = document.createElement('th');
+                    th.textContent = header;
+                    headerRow.appendChild(th);
+                });
+                table.appendChild(headerRow);
+                data.forEach(row => {
+                    const tr = document.createElement('tr');
+                    headers.forEach(header => {
+                        const td = document.createElement('td');
+                        td.textContent = row[header];
+                        tr.appendChild(td);
+                    });
+                    table.appendChild(tr);
+                });
+                container.appendChild(table);
+            } else {
+                container.textContent = data.error || 'Error al cargar datos.';
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Sistema de Gestión Hospitalaria</h1>
+        <div style="text-align: center;">
+            <button onclick="fetchTable('Salas')">Mostrar Salas</button>
+            <button onclick="fetchTable('TiposDiagnostico')">Mostrar Tipos de Diagnóstico</button>
+            <button onclick="fetchTable('Pacientes')">Mostrar Pacientes</button>
+            <button onclick="fetchTable('Hospitalizaciones')">Mostrar Hospitalizaciones</button>
+        </div>
+        <br>
+        <div style="text-align: center;">
+            <a href="/pacientes">Gestión de Pacientes</a>
+            <a href="/hospitalizaciones">Gestión de Hospitalizaciones</a>
+        </div>
+        <div id="table-container"></div>
+    </div>
+</body>
+</html>
